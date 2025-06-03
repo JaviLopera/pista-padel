@@ -1,24 +1,38 @@
-import { useState } from 'react';
-import './App.css';
+import { Routes, Route, Navigate } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { User } from '@supabase/supabase-js';
+import { supabase } from './supabaseClient';
+import Login from './Login';
+import Rules from './Rules';
 
-function App() {
-    const [count, setCount] = useState(0);
+export default function App() {
+    const [user, setUser] = useState<User | null>(null);
+    const [loading, setLoading] = useState<boolean>(true);
+
+    useEffect(() => {
+        // Inicialización del usuario
+        void (async () => {
+            const { data } = await supabase.auth.getUser();
+            setUser(data.user);
+            setLoading(false);
+        })();
+
+        // Listener de cambios de sesión/auth
+        const { data: subscription } = supabase.auth.onAuthStateChange((_event, session) => {
+            setUser(session?.user ?? null);
+        });
+        return () => {
+            subscription.subscription.unsubscribe();
+        };
+    }, []);
+
+    if (loading) return <div>Cargando...</div>;
 
     return (
-        <>
-            <div>
-                <p>Hola Mundo</p>
-            </div>
-            <h1>Vite + React</h1>
-            <div className="card">
-                <button onClick={() => setCount((count) => count + 1)}>count is {count}</button>
-                <p>
-                    Edit <code>src/App.jsx</code> and save to test HMR
-                </p>
-            </div>
-            <p className="read-the-docs">Click on the Vite and React logos to learn more</p>
-        </>
+        <Routes>
+            <Route path="/login" element={!user ? <Login /> : <Navigate to="/" />} />
+            <Route path="/" element={user ? <Rules /> : <Navigate to="/login" />} />
+            {/* Aquí puedes añadir más rutas protegidas */}
+        </Routes>
     );
 }
-
-export default App;
