@@ -1,6 +1,7 @@
 import { useState, FormEvent } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { supabase } from './supabaseClient';
+import { Button, Card, CardContent, CardHeader, TextField, Typography, Alert, Box } from '@mui/material';
 
 export default function Login() {
     const [email, setEmail] = useState<string>('');
@@ -20,32 +21,64 @@ export default function Login() {
     }
 
     return (
-        <div style={{ maxWidth: 400, margin: '60px auto', padding: 24, border: '1px solid #ddd', borderRadius: 8 }}>
-            <h2>Acceso vecinos</h2>
-            <form onSubmit={handleLogin}>
-                <input
-                    type="email"
-                    placeholder="Email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required
-                    autoComplete="email"
-                    style={{ display: 'block', width: '100%', marginBottom: 16, padding: 8 }}
+        <Box
+            sx={{
+                minHeight: '100vh',
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                bgcolor: '#f4f6fa',
+            }}
+        >
+            <Card sx={{ maxWidth: 400, width: '100%', boxShadow: 3 }}>
+                <CardHeader
+                    title={
+                        <Typography variant="h5" align="center">
+                            Acceso vecinos
+                        </Typography>
+                    }
                 />
-                <input
-                    type="password"
-                    placeholder="Contraseña"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                    autoComplete="current-password"
-                    style={{ display: 'block', width: '100%', marginBottom: 16, padding: 8 }}
-                />
-                {error && <div style={{ color: 'red', marginBottom: 8 }}>{error}</div>}
-                <button type="submit" style={{ width: '100%', padding: 10 }}>
-                    Entrar
-                </button>
-            </form>
-        </div>
+                <CardContent>
+                    <form onSubmit={handleLogin}>
+                        <TextField
+                            label="Email"
+                            variant="outlined"
+                            fullWidth
+                            margin="normal"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            type="email"
+                            autoComplete="email"
+                            required
+                        />
+                        <TextField
+                            label="Contraseña"
+                            variant="outlined"
+                            fullWidth
+                            margin="normal"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            type="password"
+                            autoComplete="current-password"
+                            required
+                        />
+                        {error && (
+                            <Alert severity="error" sx={{ my: 2 }}>
+                                {error}
+                            </Alert>
+                        )}
+                        <Typography variant="body2" align="center" sx={{ mt: 2 }}>
+                            ¿No tienes cuenta? <Link to="/register">Regístrate aquí</Link>
+                        </Typography>
+                        <Typography variant="body2" align="center" sx={{ mt: 2 }}>
+                            <Link to="/reset-password">¿Olvidaste tu contraseña?</Link>
+                        </Typography>
+                        <Button type="submit" variant="contained" color="primary" fullWidth sx={{ mt: 2 }}>
+                            Entrar
+                        </Button>
+                    </form>
+                </CardContent>
+            </Card>
+        </Box>
     );
 }

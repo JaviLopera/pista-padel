@@ -4,6 +4,9 @@ import { User } from '@supabase/supabase-js';
 import { supabase } from './supabaseClient';
 import Login from './Login';
 import Rules from './Rules';
+import Register from './Register';
+import ResetPassword from './ResetPassword';
+import UpdatePassword from './UpdatePassword';
 
 export default function App() {
     const [user, setUser] = useState<User | null>(null);
@@ -31,6 +34,9 @@ export default function App() {
     return (
         <Routes>
             <Route path="/login" element={!user ? <Login /> : <Navigate to="/" />} />
+            <Route path="/register" element={!user ? <Register /> : <Navigate to="/" />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
+            <Route path="/update-password" element={<UpdatePassword />} />
             <Route path="/" element={user ? <Rules /> : <Navigate to="/login" />} />
             {/* Aquí puedes añadir más rutas protegidas */}
         </Routes>
