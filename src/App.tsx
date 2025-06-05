@@ -7,6 +7,7 @@ import Rules from './Rules';
 import Register from './Register';
 import ResetPassword from './ResetPassword';
 import UpdatePassword from './UpdatePassword';
+import CalendarReservations from './CalendarReservations';
 
 export default function App() {
     const [user, setUser] = useState<User | null>(null);
@@ -38,6 +39,8 @@ export default function App() {
             <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/update-password" element={<UpdatePassword />} />
             <Route path="/" element={user ? <Rules /> : <Navigate to="/login" />} />
+            <Route path="/calendario" element={user ? <CalendarReservations /> : <Navigate to="/login" />} />
+
             {/* Aquí puedes añadir más rutas protegidas */}
         </Routes>
     );

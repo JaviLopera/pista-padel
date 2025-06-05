@@ -16,6 +16,8 @@ export default function Register() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [address, setAddress] = useState('');
+    const [nombre, setNombre] = useState('');
+    const [apellidos, setApellidos] = useState('');
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
     const navigate = useNavigate();
@@ -57,11 +59,13 @@ export default function Register() {
                     id: signupData.user.id,
                     email: signupData.user.email,
                     address: address,
+                    nombre: nombre,
+                    apellidos: apellidos,
                 },
             ]);
 
         if (profileError) {
-            setError('Usuario creado, pero no se guardó la dirección.');
+            setError('Usuario creado, pero no se guardó la información personal.');
             // Continúa, pero sería bueno notificarte a ti como admin si esto falla.
         }
 
@@ -95,6 +99,24 @@ export default function Register() {
                 />
                 <CardContent>
                     <form onSubmit={handleRegister}>
+                        <TextField
+                            label="Nombre"
+                            variant="outlined"
+                            fullWidth
+                            margin="normal"
+                            value={nombre}
+                            onChange={e => setNombre(e.target.value)}
+                            required
+                        />
+                        <TextField
+                            label="Apellidos"
+                            variant="outlined"
+                            fullWidth
+                            margin="normal"
+                            value={apellidos}
+                            onChange={e => setApellidos(e.target.value)}
+                            required
+                        />
                         <TextField
                             label="Email"
                             variant="outlined"
