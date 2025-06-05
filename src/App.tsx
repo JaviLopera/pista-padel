@@ -8,6 +8,8 @@ import Register from './Register';
 import ResetPassword from './ResetPassword';
 import UpdatePassword from './UpdatePassword';
 import CalendarReservations from './CalendarReservations';
+import AdminPanel from './admin/components/AdminUsers';
+import AdminHome from './admin/AdminHome';
 
 export default function App() {
     const [user, setUser] = useState<User | null>(null);
@@ -40,6 +42,21 @@ export default function App() {
             <Route path="/update-password" element={<UpdatePassword />} />
             <Route path="/" element={user ? <Rules /> : <Navigate to="/login" />} />
             <Route path="/calendario" element={user ? <CalendarReservations /> : <Navigate to="/login" />} />
+            <Route
+                path="/admin/*"
+                element={
+                    user && user.email === 'javier.lopera.94@gmail.com' ? (
+                        <Routes>
+                            <Route path="" element={<AdminHome />} />
+                            <Route path="usuarios" element={<AdminPanel />} />
+                            {/* <Route path="invitaciones" element={<InvitationsPanel />} /> */}
+                            {/* <Route path="reservas" element={<ReservasAdminPanel />} /> */}
+                        </Routes>
+                    ) : (
+                        <Navigate to="/" />
+                    )
+                }
+            />
 
             {/* Aquí puedes añadir más rutas protegidas */}
         </Routes>
