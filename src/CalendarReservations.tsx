@@ -7,6 +7,7 @@ import interactionPlugin from '@fullcalendar/interaction';
 import esLocale from '@fullcalendar/core/locales/es';
 import { Dialog, DialogTitle, DialogContent, DialogActions, Button, TextField, Alert, Typography } from '@mui/material';
 import { DateSelectArg, EventClickArg } from '@fullcalendar/core';
+import { startOfWeek, endOfWeek, formatISO, addDays, isAfter, parseISO } from 'date-fns';
 
 type Booking = {
     id: string;
@@ -58,8 +59,8 @@ export default function CalendarReservations() {
                         title: booking.user_email ?? 'Reservado',
                         start: booking.start_time,
                         end: booking.end_time,
-                        backgroundColor: '#1976d2',
-                        borderColor: '#1976d2',
+                        backgroundColor: booking.user_id === currentUserId ? '#43a047' : '#1976d2', // Verde para tus reservas
+                        borderColor: booking.user_id === currentUserId ? '#43a047' : '#1976d2',
                         user_id: booking.user_id,
                     })),
                 );
@@ -99,6 +100,48 @@ export default function CalendarReservations() {
             return;
         }
 
+        // Verifica que haya una fecha de inicio válida
+        const reservaInicio = selectedSlot?.start ? parseISO(selectedSlot.start) : null;
+        if (!reservaInicio) {
+            setError('Fecha de inicio de reserva no válida.');
+            setLoading(false);
+            return;
+        }
+
+        // No permitir reservas a más de 7 días vista
+        const now = new Date();
+        const maxFutureDate = addDays(now, 7);
+        if (isAfter(reservaInicio, maxFutureDate)) {
+            setError('Solo puedes reservar dentro de los próximos 7 días.');
+            setLoading(false);
+            return;
+        }
+
+        // --- Cambia aquí ---
+        // Limitar a máximo 3 reservas activas en la semana de la FECHA DE LA RESERVA
+        const weekStart = startOfWeek(reservaInicio, { weekStartsOn: 1 }); // Lunes de la semana de la reserva
+        const weekEnd = endOfWeek(reservaInicio, { weekStartsOn: 1 }); // Domingo de la semana de la reserva
+
+        const { data: myBookings, error: myBookingsError } = await supabase
+            .from('bookings')
+            .select('*')
+            .eq('user_id', user.id)
+            .eq('status', 'active')
+            .gte('start_time', weekStart.toISOString())
+            .lte('start_time', weekEnd.toISOString());
+
+        if (myBookingsError) {
+            setError('Error comprobando tus reservas.');
+            setLoading(false);
+            return;
+        }
+
+        if (myBookings && myBookings.length >= 3) {
+            setError('No puedes hacer más de 3 reservas en esa semana.');
+            setLoading(false);
+            return;
+        }
+
         // Comprobar solapamientos antes de reservar
         const { data: overlapping } = await supabase
             .from('bookings')
@@ -111,9 +154,9 @@ export default function CalendarReservations() {
             setLoading(false);
             return;
         }
-        const userEmail = user.email;
 
         // Insertar reserva
+        const userEmail = user.email;
         const { error: insertError } = await supabase.from('bookings').insert([
             {
                 user_id: user.id,
@@ -144,11 +187,7 @@ export default function CalendarReservations() {
     async function handleDeleteReservation() {
         if (!selectedEvent || !currentUserId) return;
         if (selectedEvent.user_id !== currentUserId) return;
-        const { error } = await supabase
-            .from('bookings')
-            .delete()
-            .eq('id', selectedEvent.id)
-            .eq('user_id', currentUserId);
+        const { error } = await supabase.from('bookings').delete().eq('id', selectedEvent.id).eq('user_id', currentUserId);
         if (!error) {
             setRefresh((r) => r + 1);
             setSelectedEvent(null);
@@ -166,6 +205,10 @@ export default function CalendarReservations() {
                     left: 'prev,next today',
                     center: 'title',
                     right: 'dayGridMonth,timeGridWeek,timeGridDay',
+                }}
+                validRange={{
+                    start: formatISO(new Date(), { representation: 'date' }),
+                    end: formatISO(addDays(new Date(), 7), { representation: 'date' }),
                 }}
                 locale={esLocale}
                 slotMinTime="08:00:00"
@@ -190,13 +233,7 @@ export default function CalendarReservations() {
                             fullWidth
                             InputProps={{ readOnly: true }}
                         />
-                        <TextField
-                            label="Fin"
-                            value={selectedSlot?.end ?? ''}
-                            margin="normal"
-                            fullWidth
-                            InputProps={{ readOnly: true }}
-                        />
+                        <TextField label="Fin" value={selectedSlot?.end ?? ''} margin="normal" fullWidth InputProps={{ readOnly: true }} />
                         {error && (
                             <Alert severity="error" sx={{ my: 2 }}>
                                 {error}
