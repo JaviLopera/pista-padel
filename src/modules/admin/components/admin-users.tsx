@@ -16,6 +16,8 @@ import {
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../../../shared/services/supabase-client.service';
+import MobileLayout from '../../../shared/components/mobile-layout';
+import { User } from '@supabase/supabase-js';
 
 type UserProfile = {
     id: string;
@@ -32,7 +34,7 @@ type Booking = {
     status: string;
 };
 
-export default function AdminUserPanelComponent() {
+export default function AdminUserPanelComponent({ user }: { user: User }) {
     const [users, setUsers] = useState<UserProfile[]>([]);
     const [selectedUser, setSelectedUser] = useState<UserProfile | null>(null);
     const [userBookings, setUserBookings] = useState<Booking[]>([]);
@@ -74,77 +76,79 @@ export default function AdminUserPanelComponent() {
     }
 
     return (
-        <Box sx={{ p: 2, maxWidth: 420, mx: 'auto' }}>
-            {/* Flecha de volver */}
-            <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-                <IconButton edge="start" color="primary" aria-label="volver" onClick={() => navigate('/admin')} sx={{ mr: 1 }}>
-                    <ArrowBackIosNewIcon />
-                </IconButton>
-                <Typography variant="h6" sx={{ flexGrow: 1 }}>
-                    Gestión de usuarios
-                </Typography>
-            </Box>
+        <MobileLayout title="Administración de usuarios" user={user}>
+            <Box sx={{ p: 2, maxWidth: 420, mx: 'auto' }}>
+                {/* Flecha de volver */}
+                <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+                    <IconButton edge="start" color="primary" aria-label="volver" onClick={() => navigate('/admin')} sx={{ mr: 1 }}>
+                        <ArrowBackIosNewIcon />
+                    </IconButton>
+                    <Typography variant="h6" sx={{ flexGrow: 1 }}>
+                        Gestión de usuarios
+                    </Typography>
+                </Box>
 
-            {error && (
-                <Alert severity="error" sx={{ mb: 2 }}>
-                    {error}
-                </Alert>
-            )}
+                {error && (
+                    <Alert severity="error" sx={{ mb: 2 }}>
+                        {error}
+                    </Alert>
+                )}
 
-            <Stack spacing={2}>
-                {users.map((user) => (
-                    <Card key={user.id} sx={{ width: '100%', borderRadius: 3, boxShadow: 3 }}>
-                        <CardContent>
-                            <Typography fontWeight={600}>
-                                {user.nombre} {user.apellidos}
-                            </Typography>
-                            <Typography color="text.secondary" sx={{ mb: 1 }}>
-                                {user.email}
-                            </Typography>
-                            <Typography variant="body2" sx={{ mb: 1 }}>
-                                Dirección: {user.address ?? ''}
-                            </Typography>
-                            <Box sx={{ display: 'flex', gap: 1 }}>
-                                <Button variant="outlined" size="small" onClick={() => handleShowBookings(user)} sx={{ flex: 1 }}>
-                                    Ver reservas
-                                </Button>
-                                <Button
-                                    variant="contained"
-                                    color="error"
-                                    size="small"
-                                    onClick={() => handleDeleteUser(user)}
-                                    sx={{ flex: 1 }}
-                                >
-                                    Borrar usuario
-                                </Button>
-                            </Box>
-                        </CardContent>
-                    </Card>
-                ))}
-            </Stack>
-
-            {/* Diálogo para ver reservas */}
-            <Dialog open={showBookings} onClose={() => setShowBookings(false)} maxWidth="xs" fullWidth>
-                <DialogTitle>
-                    Reservas de {selectedUser?.nombre} {selectedUser?.apellidos}
-                </DialogTitle>
-                <DialogContent>
-                    {userBookings.length === 0 ? (
-                        <Typography>No tiene reservas.</Typography>
-                    ) : (
-                        userBookings.map((booking) => (
-                            <Box key={booking.id} sx={{ mb: 2, borderBottom: '1px solid #eee', pb: 1 }}>
-                                <Typography>
-                                    {booking.start_time} - {booking.end_time} ({booking.status})
+                <Stack spacing={2}>
+                    {users.map((user) => (
+                        <Card key={user.id} sx={{ width: '100%', borderRadius: 3, boxShadow: 3 }}>
+                            <CardContent>
+                                <Typography fontWeight={600}>
+                                    {user.nombre} {user.apellidos}
                                 </Typography>
-                            </Box>
-                        ))
-                    )}
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={() => setShowBookings(false)}>Cerrar</Button>
-                </DialogActions>
-            </Dialog>
-        </Box>
+                                <Typography color="text.secondary" sx={{ mb: 1 }}>
+                                    {user.email}
+                                </Typography>
+                                <Typography variant="body2" sx={{ mb: 1 }}>
+                                    Dirección: {user.address ?? ''}
+                                </Typography>
+                                <Box sx={{ display: 'flex', gap: 1 }}>
+                                    <Button variant="outlined" size="small" onClick={() => handleShowBookings(user)} sx={{ flex: 1 }}>
+                                        Ver reservas
+                                    </Button>
+                                    <Button
+                                        variant="contained"
+                                        color="error"
+                                        size="small"
+                                        onClick={() => handleDeleteUser(user)}
+                                        sx={{ flex: 1 }}
+                                    >
+                                        Borrar usuario
+                                    </Button>
+                                </Box>
+                            </CardContent>
+                        </Card>
+                    ))}
+                </Stack>
+
+                {/* Diálogo para ver reservas */}
+                <Dialog open={showBookings} onClose={() => setShowBookings(false)} maxWidth="xs" fullWidth>
+                    <DialogTitle>
+                        Reservas de {selectedUser?.nombre} {selectedUser?.apellidos}
+                    </DialogTitle>
+                    <DialogContent>
+                        {userBookings.length === 0 ? (
+                            <Typography>No tiene reservas.</Typography>
+                        ) : (
+                            userBookings.map((booking) => (
+                                <Box key={booking.id} sx={{ mb: 2, borderBottom: '1px solid #eee', pb: 1 }}>
+                                    <Typography>
+                                        {booking.start_time} - {booking.end_time} ({booking.status})
+                                    </Typography>
+                                </Box>
+                            ))
+                        )}
+                    </DialogContent>
+                    <DialogActions>
+                        <Button onClick={() => setShowBookings(false)}>Cerrar</Button>
+                    </DialogActions>
+                </Dialog>
+            </Box>
+        </MobileLayout>
     );
 }

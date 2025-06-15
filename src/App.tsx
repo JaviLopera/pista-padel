@@ -40,15 +40,15 @@ export default function App() {
             <Route path="/register" element={!user ? <RegisterView /> : <Navigate to="/" />} />
             <Route path="/reset-password" element={<ResetPasswordView />} />
             <Route path="/update-password" element={<UpdatePasswordView />} />
-            <Route path="/" element={user ? <RulesComponent /> : <Navigate to="/login" />} />
-            <Route path="/calendario" element={user ? <CalendarReservationsView /> : <Navigate to="/login" />} />
+            <Route path="/" element={user ? <RulesComponent user={user}/> : <Navigate to="/login" />} />
+            <Route path="/calendario" element={user ? <CalendarReservationsView user={user} /> : <Navigate to="/login" />} />
             <Route
                 path="/admin/*"
                 element={
                     user && user.email === 'javier.lopera.94@gmail.com' ? (
                         <Routes>
-                            <Route path="" element={<AdminHomeView />} />
-                            <Route path="usuarios" element={<AdminUserPanelComponent />} />
+                            <Route path="" element={<AdminHomeView user={user} />} />
+                            <Route path="usuarios" element={<AdminUserPanelComponent user={user} />} />
                             {/* <Route path="invitaciones" element={<InvitationsPanel />} /> */}
                             {/* <Route path="reservas" element={<ReservasAdminPanel />} /> */}
                         </Routes>

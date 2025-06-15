@@ -8,6 +8,8 @@ import esLocale from '@fullcalendar/core/locales/es';
 import { Dialog, DialogTitle, DialogContent, DialogActions, Button, TextField, Alert, Typography } from '@mui/material';
 import { DateSelectArg, EventClickArg } from '@fullcalendar/core';
 import { startOfWeek, endOfWeek, formatISO, addDays, isAfter, parseISO } from 'date-fns';
+import MobileLayout from '../../shared/components/mobile-layout';
+import { User } from '@supabase/supabase-js';
 
 type Booking = {
     id: string;
@@ -28,7 +30,7 @@ type CalendarEvent = {
     user_id?: string;
 };
 
-export default function CalendarReservationsView() {
+export default function CalendarReservationsView({ user }: { user: User }) {
     const [events, setEvents] = useState<CalendarEvent[]>([]);
     const [open, setOpen] = useState(false);
     const [selectedSlot, setSelectedSlot] = useState<{ start: string; end: string } | null>(null);
@@ -195,90 +197,105 @@ export default function CalendarReservationsView() {
     }
 
     return (
-        <div
-            style={{ maxWidth: 900, margin: '32px auto', background: '#fff', borderRadius: 12, boxShadow: '0 6px 32px #0001', padding: 16 }}
-        >
-            <FullCalendar
-                plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
-                initialView="timeGridWeek"
-                headerToolbar={{
-                    left: 'prev,next today',
-                    center: 'title',
-                    right: 'dayGridMonth,timeGridWeek,timeGridDay',
+        <MobileLayout title="Reservar pista" user={user}>
+            <div
+                style={{
+                    maxWidth: 900,
+                    margin: '32px auto',
+                    background: '#fff',
+                    borderRadius: 12,
+                    boxShadow: '0 6px 32px #0001',
+                    padding: 16,
                 }}
-                validRange={{
-                    start: formatISO(new Date(), { representation: 'date' }),
-                    end: formatISO(addDays(new Date(), 7), { representation: 'date' }),
-                }}
-                locale={esLocale}
-                slotMinTime="08:00:00"
-                slotMaxTime="23:00:00"
-                selectable
-                selectMirror
-                select={handleSelect}
-                events={events}
-                eventClick={handleEventClick}
-                height="auto"
-            />
+            >
+                <FullCalendar
+                    plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
+                    initialView="timeGridWeek"
+                    headerToolbar={{
+                        left: 'prev,next today',
+                        center: 'title',
+                        right: 'dayGridMonth,timeGridWeek,timeGridDay',
+                    }}
+                    validRange={{
+                        start: formatISO(new Date(), { representation: 'date' }),
+                        end: formatISO(addDays(new Date(), 7), { representation: 'date' }),
+                    }}
+                    locale={esLocale}
+                    slotMinTime="08:00:00"
+                    slotMaxTime="23:00:00"
+                    selectable
+                    selectMirror
+                    select={handleSelect}
+                    events={events}
+                    eventClick={handleEventClick}
+                    height="auto"
+                />
 
-            {/* Modal para crear nueva reserva */}
-            <Dialog open={open} onClose={handleClose}>
-                <DialogTitle>Nueva reserva</DialogTitle>
-                <DialogContent>
-                    <form onSubmit={handleSubmit}>
-                        <TextField
-                            label="Inicio"
-                            value={selectedSlot?.start ?? ''}
-                            margin="normal"
-                            fullWidth
-                            InputProps={{ readOnly: true }}
-                        />
-                        <TextField label="Fin" value={selectedSlot?.end ?? ''} margin="normal" fullWidth InputProps={{ readOnly: true }} />
-                        {error && (
-                            <Alert severity="error" sx={{ my: 2 }}>
-                                {error}
-                            </Alert>
-                        )}
-                        {success && (
-                            <Alert severity="success" sx={{ my: 2 }}>
-                                {success}
-                            </Alert>
-                        )}
-                        <DialogActions>
-                            <Button onClick={handleClose} color="secondary" disabled={loading}>
-                                Cancelar
-                            </Button>
-                            <Button type="submit" variant="contained" color="primary" disabled={loading}>
-                                Reservar
-                            </Button>
-                        </DialogActions>
-                    </form>
-                </DialogContent>
-            </Dialog>
+                {/* Modal para crear nueva reserva */}
+                <Dialog open={open} onClose={handleClose}>
+                    <DialogTitle>Nueva reserva</DialogTitle>
+                    <DialogContent>
+                        <form onSubmit={handleSubmit}>
+                            <TextField
+                                label="Inicio"
+                                value={selectedSlot?.start ?? ''}
+                                margin="normal"
+                                fullWidth
+                                InputProps={{ readOnly: true }}
+                            />
+                            <TextField
+                                label="Fin"
+                                value={selectedSlot?.end ?? ''}
+                                margin="normal"
+                                fullWidth
+                                InputProps={{ readOnly: true }}
+                            />
+                            {error && (
+                                <Alert severity="error" sx={{ my: 2 }}>
+                                    {error}
+                                </Alert>
+                            )}
+                            {success && (
+                                <Alert severity="success" sx={{ my: 2 }}>
+                                    {success}
+                                </Alert>
+                            )}
+                            <DialogActions>
+                                <Button onClick={handleClose} color="secondary" disabled={loading}>
+                                    Cancelar
+                                </Button>
+                                <Button type="submit" variant="contained" color="primary" disabled={loading}>
+                                    Reservar
+                                </Button>
+                            </DialogActions>
+                        </form>
+                    </DialogContent>
+                </Dialog>
 
-            {/* Modal para ver/cancelar una reserva existente */}
-            <Dialog open={!!selectedEvent} onClose={() => setSelectedEvent(null)}>
-                <DialogTitle>Reserva</DialogTitle>
-                <DialogContent>
-                    <Typography>
-                        <strong>Inicio:</strong> {selectedEvent?.start}
-                        <br />
-                        <strong>Fin:</strong> {selectedEvent?.end}
-                        <br />
-                        <strong>Reservado por:</strong> {selectedEvent?.title}
-                    </Typography>
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={() => setSelectedEvent(null)} color="secondary">
-                        Cerrar
-                    </Button>
-                    {selectedEvent && currentUserId && selectedEvent.user_id === currentUserId && (
-                        <Button color="error" variant="contained" onClick={handleDeleteReservation}>
-                            Cancelar mi reserva
+                {/* Modal para ver/cancelar una reserva existente */}
+                <Dialog open={!!selectedEvent} onClose={() => setSelectedEvent(null)}>
+                    <DialogTitle>Reserva</DialogTitle>
+                    <DialogContent>
+                        <Typography>
+                            <strong>Inicio:</strong> {selectedEvent?.start}
+                            <br />
+                            <strong>Fin:</strong> {selectedEvent?.end}
+                            <br />
+                            <strong>Reservado por:</strong> {selectedEvent?.title}
+                        </Typography>
+                    </DialogContent>
+                    <DialogActions>
+                        <Button onClick={() => setSelectedEvent(null)} color="secondary">
+                            Cerrar
                         </Button>
-                    )}
-                </DialogActions>
-            </Dialog>
-        </div>
+                        {selectedEvent && currentUserId && selectedEvent.user_id === currentUserId && (
+                            <Button color="error" variant="contained" onClick={handleDeleteReservation}>
+                                Cancelar mi reserva
+                            </Button>
+                        )}
+                    </DialogActions>
+                </Dialog>
+            </div>
+        </MobileLayout>
     );
 }
