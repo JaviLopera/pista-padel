@@ -18,6 +18,7 @@ import PrivateRoute from './shared/router/private-router';
 import AdminRoute from './shared/router/admin-route';
 import AdminInvitationsPanelComponent from './modules/admin/components/admin-invitations';
 import { Box } from '@mui/material';
+import AdminReservasPanelComponent from './modules/admin/components/admin-reservas';
 
 function RulesView({ user }: { user: User }) {
     return (
@@ -86,8 +87,7 @@ export default function App() {
                                 <Route path="" element={<AdminHomeView user={user!} />} />
                                 <Route path="usuarios" element={<AdminUserPanelComponent user={user!} />} />
                                 <Route path="invitaciones" element={<AdminInvitationsPanelComponent user={user!} />} />
-
-                                {/* <Route path="reservas" element={<ReservasAdminPanel user={user!} />} /> */}
+                                <Route path="reservas" element={<AdminReservasPanelComponent user={user!} />} />
                             </Routes>
                         </AdminRoute>
                     }
