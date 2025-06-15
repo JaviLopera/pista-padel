@@ -16,6 +16,8 @@ import AdminUserPanelComponent from './modules/admin/components/admin-users';
 import MobileLayout from './shared/components/mobile-layout';
 import PrivateRoute from './shared/router/private-router';
 import AdminRoute from './shared/router/admin-route';
+import AdminInvitationsPanelComponent from './modules/admin/components/admin-invitations';
+import { Box } from '@mui/material';
 
 function RulesView({ user }: { user: User }) {
     return (
@@ -49,48 +51,51 @@ export default function App() {
     if (loading) return <div>Cargando...</div>;
 
     return (
-        <Routes>
-            {/* Auth */}
-            <Route path="/login" element={!user ? <LoginView /> : <Navigate to="/" />} />
-            <Route path="/register" element={!user ? <RegisterView /> : <Navigate to="/" />} />
-            <Route path="/reset-password" element={<ResetPasswordView />} />
-            <Route path="/update-password" element={<UpdatePasswordView />} />
+        <Box sx={{ px: 3, width: '100%', boxSizing: 'border-box' }}>
+            <Routes>
+                {/* Auth */}
+                <Route path="/login" element={!user ? <LoginView /> : <Navigate to="/" />} />
+                <Route path="/register" element={!user ? <RegisterView /> : <Navigate to="/" />} />
+                <Route path="/reset-password" element={<ResetPasswordView />} />
+                <Route path="/update-password" element={<UpdatePasswordView />} />
 
-            {/* Público sólo si está logueado */}
-            <Route
-                path="/"
-                element={
-                    <PrivateRoute user={user}>
-                        <RulesView user={user!} />
-                    </PrivateRoute>
-                }
-            />
-            <Route
-                path="/calendario"
-                element={
-                    <PrivateRoute user={user}>
-                        <CalendarReservationsView user={user!} />
-                    </PrivateRoute>
-                }
-            />
+                {/* Público sólo si está logueado */}
+                <Route
+                    path="/"
+                    element={
+                        <PrivateRoute user={user}>
+                            <RulesView user={user!} />
+                        </PrivateRoute>
+                    }
+                />
+                <Route
+                    path="/calendario"
+                    element={
+                        <PrivateRoute user={user}>
+                            <CalendarReservationsView user={user!} />
+                        </PrivateRoute>
+                    }
+                />
 
-            {/* Admin */}
-            <Route
-                path="/admin/*"
-                element={
-                    <AdminRoute user={user}>
-                        <Routes>
-                            <Route path="" element={<AdminHomeView user={user!} />} />
-                            <Route path="usuarios" element={<AdminUserPanelComponent user={user!} />} />
-                            {/* <Route path="invitaciones" element={<InvitationsPanel user={user!} />} /> */}
-                            {/* <Route path="reservas" element={<ReservasAdminPanel user={user!} />} /> */}
-                        </Routes>
-                    </AdminRoute>
-                }
-            />
+                {/* Admin */}
+                <Route
+                    path="/admin/*"
+                    element={
+                        <AdminRoute user={user}>
+                            <Routes>
+                                <Route path="" element={<AdminHomeView user={user!} />} />
+                                <Route path="usuarios" element={<AdminUserPanelComponent user={user!} />} />
+                                <Route path="invitaciones" element={<AdminInvitationsPanelComponent user={user!} />} />
 
-            {/* 404 */}
-            <Route path="*" element={<Navigate to={user ? '/' : '/login'} />} />
-        </Routes>
+                                {/* <Route path="reservas" element={<ReservasAdminPanel user={user!} />} /> */}
+                            </Routes>
+                        </AdminRoute>
+                    }
+                />
+
+                {/* 404 */}
+                <Route path="*" element={<Navigate to={user ? '/' : '/login'} />} />
+            </Routes>
+        </Box>
     );
 }

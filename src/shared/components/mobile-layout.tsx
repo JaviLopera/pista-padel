@@ -20,7 +20,7 @@ export default function MobileLayout({ title, user, children }: MobileLayoutProp
     };
 
     return (
-        <Box sx={{ pb: 8, minHeight: '100vh', bgcolor: '#f4f6fa' }}>
+        <Box sx={{ minHeight: '100vh', bgcolor: '#f4f6fa' }}>
             <AppBar position="fixed" color="primary" sx={{ top: 0, left: 0 }}>
                 <Toolbar sx={{ minHeight: 56 }}>
                     <Typography variant="h6" sx={{ flexGrow: 1, textAlign: 'center' }}>
@@ -33,7 +33,8 @@ export default function MobileLayout({ title, user, children }: MobileLayoutProp
                     )}
                 </Toolbar>
             </AppBar>
-            <Box sx={{ pt: 7, px: 0.5, maxWidth: 480, mx: 'auto' }}>
+            {/* pt: padding top para dejar sitio al header, pb: para posible bottom nav */}
+            <Box sx={{ pt: '72px', pb: 2, width: '100%' }}>
                 {children}
             </Box>
         </Box>
