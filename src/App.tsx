@@ -2,14 +2,28 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { User } from '@supabase/supabase-js';
 import { supabase } from './shared/services/supabase-client.service';
+
 import LoginView from './modules/login/login.view';
-import RulesComponent from './shared/components/rules.component';
+import RegisterView from './modules/register/register.view';
 import ResetPasswordView from './modules/login/reset-password.view';
 import UpdatePasswordView from './modules/login/update-password.view';
 import CalendarReservationsView from './modules/calendar-reservations/calendar-reservations.view';
-import AdminUserPanelComponent from './modules/admin/components/admin-users';
+import RulesComponent from './shared/components/rules.component';
 import AdminHomeView from './modules/admin/admin-home.view';
-import RegisterView from './modules/register/register.view';
+import AdminUserPanelComponent from './modules/admin/components/admin-users';
+
+// Opcional: crea un pequeño view wrapper para las reglas, así tienes título/header
+import MobileLayout from './shared/components/mobile-layout';
+import PrivateRoute from './shared/router/private-router';
+import AdminRoute from './shared/router/admin-route';
+
+function RulesView({ user }: { user: User }) {
+    return (
+        <MobileLayout title="Reglas de la pista" user={user}>
+            <RulesComponent user={user} />
+        </MobileLayout>
+    );
+}
 
 export default function App() {
     const [user, setUser] = useState<User | null>(null);
@@ -36,29 +50,47 @@ export default function App() {
 
     return (
         <Routes>
+            {/* Auth */}
             <Route path="/login" element={!user ? <LoginView /> : <Navigate to="/" />} />
             <Route path="/register" element={!user ? <RegisterView /> : <Navigate to="/" />} />
             <Route path="/reset-password" element={<ResetPasswordView />} />
             <Route path="/update-password" element={<UpdatePasswordView />} />
-            <Route path="/" element={user ? <RulesComponent user={user}/> : <Navigate to="/login" />} />
-            <Route path="/calendario" element={user ? <CalendarReservationsView user={user} /> : <Navigate to="/login" />} />
+
+            {/* Público sólo si está logueado */}
             <Route
-                path="/admin/*"
+                path="/"
                 element={
-                    user && user.email === 'javier.lopera.94@gmail.com' ? (
-                        <Routes>
-                            <Route path="" element={<AdminHomeView user={user} />} />
-                            <Route path="usuarios" element={<AdminUserPanelComponent user={user} />} />
-                            {/* <Route path="invitaciones" element={<InvitationsPanel />} /> */}
-                            {/* <Route path="reservas" element={<ReservasAdminPanel />} /> */}
-                        </Routes>
-                    ) : (
-                        <Navigate to="/" />
-                    )
+                    <PrivateRoute user={user}>
+                        <RulesView user={user!} />
+                    </PrivateRoute>
+                }
+            />
+            <Route
+                path="/calendario"
+                element={
+                    <PrivateRoute user={user}>
+                        <CalendarReservationsView user={user!} />
+                    </PrivateRoute>
                 }
             />
 
-            {/* Aquí puedes añadir más rutas protegidas */}
+            {/* Admin */}
+            <Route
+                path="/admin/*"
+                element={
+                    <AdminRoute user={user}>
+                        <Routes>
+                            <Route path="" element={<AdminHomeView user={user!} />} />
+                            <Route path="usuarios" element={<AdminUserPanelComponent user={user!} />} />
+                            {/* <Route path="invitaciones" element={<InvitationsPanel user={user!} />} /> */}
+                            {/* <Route path="reservas" element={<ReservasAdminPanel user={user!} />} /> */}
+                        </Routes>
+                    </AdminRoute>
+                }
+            />
+
+            {/* 404 */}
+            <Route path="*" element={<Navigate to={user ? '/' : '/login'} />} />
         </Routes>
     );
 }
