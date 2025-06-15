@@ -1,6 +1,6 @@
 import { useState, FormEvent } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { supabase } from './supabaseClient';
+import { supabase } from '../../shared/services/supabase-client.service';
 import {
     Button,
     Card,
@@ -12,7 +12,7 @@ import {
     Box,
 } from '@mui/material';
 
-export default function Register() {
+export default function RegisterView() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [address, setAddress] = useState('');
@@ -76,6 +76,7 @@ export default function Register() {
             .eq('email', email);
 
         setSuccess('Registro correcto. Revisa tu email para confirmar la cuenta.');
+        // eslint-disable-next-line no-undef
         setTimeout(() => navigate('/login'), 2000);
     }
 

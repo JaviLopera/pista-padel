@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { supabase } from './supabaseClient';
+import { supabase } from '../../shared/services/supabase-client.service';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
@@ -28,7 +28,7 @@ type CalendarEvent = {
     user_id?: string;
 };
 
-export default function CalendarReservations() {
+export default function CalendarReservationsView() {
     const [events, setEvents] = useState<CalendarEvent[]>([]);
     const [open, setOpen] = useState(false);
     const [selectedSlot, setSelectedSlot] = useState<{ start: string; end: string } | null>(null);

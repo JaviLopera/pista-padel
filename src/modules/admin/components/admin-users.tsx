@@ -15,7 +15,7 @@ import {
 } from '@mui/material';
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
 import { useNavigate } from 'react-router-dom';
-import { supabase } from '../../supabaseClient';
+import { supabase } from '../../../shared/services/supabase-client.service';
 
 type UserProfile = {
     id: string;
@@ -32,7 +32,7 @@ type Booking = {
     status: string;
 };
 
-export default function AdminPanel() {
+export default function AdminUserPanelComponent() {
     const [users, setUsers] = useState<UserProfile[]>([]);
     const [selectedUser, setSelectedUser] = useState<UserProfile | null>(null);
     const [userBookings, setUserBookings] = useState<Booking[]>([]);

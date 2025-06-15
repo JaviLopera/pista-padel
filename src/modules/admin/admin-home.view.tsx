@@ -1,7 +1,7 @@
 import { Box, Typography, Card, CardContent, Button } from '@mui/material';
 import { Link as RouterLink } from 'react-router-dom';
 
-export default function AdminHome() {
+export default function AdminHomeView() {
     return (
         <Box sx={{ p: 2 }}>
             <Typography variant="h4" align="center" gutterBottom>

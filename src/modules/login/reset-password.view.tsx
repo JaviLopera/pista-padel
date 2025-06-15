@@ -1,5 +1,5 @@
 import { useState, FormEvent } from "react";
-import { supabase } from "./supabaseClient";
+import { supabase } from "../../shared/services/supabase-client.service";
 import {
     Button,
     Card,
@@ -12,22 +12,23 @@ import {
 } from "@mui/material";
 import { Link } from "react-router-dom";
 
-export default function UpdatePassword() {
-    const [password, setPassword] = useState("");
+export default function ResetPasswordView() {
+    const [email, setEmail] = useState("");
     const [error, setError] = useState("");
     const [success, setSuccess] = useState("");
 
-    async function handleUpdate(e: FormEvent<HTMLFormElement>) {
+    async function handleReset(e: FormEvent<HTMLFormElement>) {
         e.preventDefault();
         setError("");
         setSuccess("");
-        const { error } = await supabase.auth.updateUser({
-            password,
+        const { error } = await supabase.auth.resetPasswordForEmail(email, {
+            // eslint-disable-next-line no-undef
+            redirectTo: window.location.origin + "/update-password",
         });
         if (error) {
             setError(error.message);
         } else {
-            setSuccess("¡Contraseña actualizada correctamente!");
+            setSuccess("Te hemos enviado un email con instrucciones para restablecer la contraseña.");
         }
     }
 
@@ -45,21 +46,21 @@ export default function UpdatePassword() {
                 <CardHeader
                     title={
                         <Typography variant="h5" align="center">
-                            Cambiar contraseña
+                            Restablecer contraseña
                         </Typography>
                     }
                 />
                 <CardContent>
-                    <form onSubmit={handleUpdate}>
+                    <form onSubmit={handleReset}>
                         <TextField
-                            label="Nueva contraseña"
+                            label="Email"
                             variant="outlined"
                             fullWidth
                             margin="normal"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            type="password"
-                            autoComplete="new-password"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            type="email"
+                            autoComplete="email"
                             required
                         />
                         {error && (
@@ -82,7 +83,7 @@ export default function UpdatePassword() {
                             fullWidth
                             sx={{ mt: 2 }}
                         >
-                            Guardar contraseña nueva
+                            Enviar email de restablecimiento
                         </Button>
                     </form>
                 </CardContent>

@@ -1,9 +1,9 @@
 import { useState, FormEvent } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { supabase } from './supabaseClient';
+import { supabase } from '../../shared/services/supabase-client.service';
 import { Button, Card, CardContent, CardHeader, TextField, Typography, Alert, Box } from '@mui/material';
 
-export default function Login() {
+export default function LoginView() {
     const [email, setEmail] = useState<string>('');
     const [password, setPassword] = useState<string>('');
     const [error, setError] = useState<string>('');

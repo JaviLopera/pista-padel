@@ -1,15 +1,15 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { User } from '@supabase/supabase-js';
-import { supabase } from './supabaseClient';
-import Login from './Login';
-import Rules from './Rules';
-import Register from './Register';
-import ResetPassword from './ResetPassword';
-import UpdatePassword from './UpdatePassword';
-import CalendarReservations from './CalendarReservations';
-import AdminPanel from './admin/components/AdminUsers';
-import AdminHome from './admin/AdminHome';
+import { supabase } from './shared/services/supabase-client.service';
+import LoginView from './modules/login/login.view';
+import RulesComponent from './shared/components/rules.component';
+import ResetPasswordView from './modules/login/reset-password.view';
+import UpdatePasswordView from './modules/login/update-password.view';
+import CalendarReservationsView from './modules/calendar-reservations/calendar-reservations.view';
+import AdminUserPanelComponent from './modules/admin/components/admin-users';
+import AdminHomeView from './modules/admin/admin-home.view';
+import RegisterView from './modules/register/register.view';
 
 export default function App() {
     const [user, setUser] = useState<User | null>(null);
@@ -36,19 +36,19 @@ export default function App() {
 
     return (
         <Routes>
-            <Route path="/login" element={!user ? <Login /> : <Navigate to="/" />} />
-            <Route path="/register" element={!user ? <Register /> : <Navigate to="/" />} />
-            <Route path="/reset-password" element={<ResetPassword />} />
-            <Route path="/update-password" element={<UpdatePassword />} />
-            <Route path="/" element={user ? <Rules /> : <Navigate to="/login" />} />
-            <Route path="/calendario" element={user ? <CalendarReservations /> : <Navigate to="/login" />} />
+            <Route path="/login" element={!user ? <LoginView /> : <Navigate to="/" />} />
+            <Route path="/register" element={!user ? <RegisterView /> : <Navigate to="/" />} />
+            <Route path="/reset-password" element={<ResetPasswordView />} />
+            <Route path="/update-password" element={<UpdatePasswordView />} />
+            <Route path="/" element={user ? <RulesComponent /> : <Navigate to="/login" />} />
+            <Route path="/calendario" element={user ? <CalendarReservationsView /> : <Navigate to="/login" />} />
             <Route
                 path="/admin/*"
                 element={
                     user && user.email === 'javier.lopera.94@gmail.com' ? (
                         <Routes>
-                            <Route path="" element={<AdminHome />} />
-                            <Route path="usuarios" element={<AdminPanel />} />
+                            <Route path="" element={<AdminHomeView />} />
+                            <Route path="usuarios" element={<AdminUserPanelComponent />} />
                             {/* <Route path="invitaciones" element={<InvitationsPanel />} /> */}
                             {/* <Route path="reservas" element={<ReservasAdminPanel />} /> */}
                         </Routes>

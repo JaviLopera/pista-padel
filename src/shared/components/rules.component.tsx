@@ -2,14 +2,14 @@
 declare const console: Console;
 
 import { useEffect, useState } from 'react';
-import { supabase } from './supabaseClient';
+import { supabase } from '../services/supabase-client.service';
 
 type Rule = {
     id: number;
     rule_text: string;
 };
 
-export default function Rules() {
+export default function RulesComponent() {
     const [rules, setRules] = useState<Rule[]>([]);
     const [loading, setLoading] = useState(true);
 
